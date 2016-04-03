@@ -45,25 +45,24 @@ Leap.loop(controllerOptions, function(frame) {
   // Display Frame object data
   var frameOutput = document.getElementById("frameData");
 
-  var frameString = "Frame ID: " + frame.id  + "<br />"
-                  + "Timestamp: " + frame.timestamp + " &micro;s<br />"
-                  + "Hands: " + frame.hands.length + "<br />"
-                  + "Fingers: " + frame.fingers.length + "<br />"
-                  + "Tools: " + frame.tools.length + "<br />"
-                  + "Gestures: " + frame.gestures.length + "<br />";
+  var frameString = //"Frame ID: " + frame.id  + "<br />" + "Timestamp: " + frame.timestamp + " &micro;s<br />"                   + 
+  frame.hands.length + " hand(s) detected, with "                 + 
+				frame.fingers.length + " fingers<br />"
+                //  + "Tools: " + frame.tools.length + "<br />"
+               ;
 
   // Frame motion factors
   if (previousFrame && previousFrame.valid) {
     var translation = frame.translation(previousFrame);
-    frameString += "Translation: " + vectorToString(translation) + " mm <br />";
+   // frameString += "Translation: " + vectorToString(translation) + " mm <br />";
 
     var rotationAxis = frame.rotationAxis(previousFrame);
     var rotationAngle = frame.rotationAngle(previousFrame);
-    frameString += "Rotation axis: " + vectorToString(rotationAxis, 2) + "<br />";
-    frameString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+ //   frameString += "Rotation axis: " + vectorToString(rotationAxis, 2) + "<br />";
+  //  frameString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
 
     var scaleFactor = frame.scaleFactor(previousFrame);
-    frameString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+    //frameString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
   }
   frameOutput.innerHTML = "<div style='width:300px; float:left; padding:5px'>" + frameString + "</div>";
 
@@ -80,16 +79,16 @@ Leap.loop(controllerOptions, function(frame) {
 	  var diffVec= [hand_default.palmPosition[0] -hand.palmPosition[0] , hand_default.palmPosition[1] -hand.palmPosition[1] , hand_default.palmPosition[2] -hand.palmPosition[2]];
 	  var dir1 = getDirection(hand.palmVelocity);
       handString += "<div style='width:300px; float:left; padding:5px'>";
-      handString += "Hand ID: " + hand.id + "<br />";
-      handString += "Type: " + hand.type + " hand" + "<br />";
-      handString += "Direction: " + vectorToString(hand.direction, 2) + "<br />";
-      handString += "Palm position: " + vectorToString(hand.palmPosition) + " mm<br />";
-	  handString += "Palm velocity: " + vectorToString(hand.palmVelocity) + " <br />";
-	  handString += "Velocity Direction: " + dir1 + "<br />";
-	  handString+= "typeof Velocity Direction is " + typeof(dir1);
+    //  handString += "Hand ID: " + hand.id + "<br />";
+      handString += "You are moving " + hand.type + " hand" + " ";
+   //   handString += "Direction: " + vectorToString(hand.direction, 2) + "<br />";
+    //  handString += "Palm position: " + vectorToString(hand.palmPosition) + " mm<br />";
+	//  handString += "Palm velocity: " + vectorToString(hand.palmVelocity) + " <br />";
+	  handString +=  dir1 + "<br />";
+	 // handString+= "typeof Velocity Direction is " + typeof(dir1);
      // handString += "Grab strength: " + hand.grabStrength + "<br />";
     //  handString += "Pinch strength: " + hand.pinchStrength + "<br />";
-      handString += "Confidence: " + hand.confidence + "<br />";
+     // handString += "Confidence: " + hand.confidence + "<br />";
     //  handString += "Arm direction: " + vectorToString(hand.arm.direction()) + "<br />";
     //  handString += "Arm center: " + vectorToString(hand.arm.center()) + "<br />";
      // handString += "Arm up vector: " + vectorToString(hand.arm.basis[1]) + "<br />";
@@ -99,14 +98,14 @@ Leap.loop(controllerOptions, function(frame) {
 	  
 	if (previousFrame && previousFrame.valid) {
         var translation = hand.translation(previousFrame);
-        handString += "Translation: " + vectorToString(translation) + " mm<br />";
+    //    handString += "Translation: " + vectorToString(translation) + " mm<br />";
         var rotationAxis = hand.rotationAxis(previousFrame, 2);
         var rotationAngle = hand.rotationAngle(previousFrame);
-        handString += "Rotation axis: " + vectorToString(rotationAxis) + "<br />";
-        handString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+    //    handString += "Rotation axis: " + vectorToString(rotationAxis) + "<br />";
+     //   handString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
 
         var scaleFactor = hand.scaleFactor(previousFrame);
-        handString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+       // handString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
       }
 
       // IDs of pointables associated with this hand
@@ -117,7 +116,7 @@ Leap.loop(controllerOptions, function(frame) {
             fingerIds.push(pointable.id);
         }
         if (fingerIds.length > 0) {
-          handString += "Fingers IDs: " + fingerIds.join(", ") + "<br />";
+     //     handString += "Fingers IDs: " + fingerIds.join(", ") + "<br />";
         }
       }
 
@@ -143,8 +142,8 @@ Leap.loop(controllerOptions, function(frame) {
       pointableString += "<div style='width:250px; float:left; padding:5px'>";
 
       if (pointable.tool) {
-        pointableString += "Pointable ID: " + pointable.id + "<br />";
-        pointableString += "Classified as a tool <br />";
+       // pointableString += "Pointable ID: " + pointable.id + "<br />";
+       // pointableString += "Classified as a tool <br />";
      //   pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
      //   pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
       //  pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
@@ -152,10 +151,10 @@ Leap.loop(controllerOptions, function(frame) {
         pointableString += "</div>";
       }
       else {
-        pointableString += "Pointable ID: " + pointable.id + "<br />";
-        pointableString += "Type: " + fingerTypeMap[pointable.type] + "<br />";
-        pointableString += "Belongs to hand with ID: " + pointable.handId + "<br />";
-        pointableString += "Classified as a finger<br />";
+        //pointableString += "Pointable ID: " + pointable.id + "<br />";
+        //pointableString += "Type: " + fingerTypeMap[pointable.type] + "<br />";
+        //pointableString += "Belongs to hand with ID: " + pointable.handId + "<br />";
+        //pointableString += "Classified as a finger<br />";
       //  pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
         //pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
        // pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
@@ -185,29 +184,30 @@ Leap.loop(controllerOptions, function(frame) {
     }
     for (var i = 0; i < frame.gestures.length; i++) {
       var gesture = frame.gestures[i];
-      gestureString += "Gesture ID: " + gesture.id + ", "
-                    + "type: " + gesture.type + ", "
-                    + "state: " + gesture.state + ", "
-                    + "hand IDs: " + gesture.handIds.join(", ") + ", "
-                    + "pointable IDs: " + gesture.pointableIds.join(", ") + ", "
-                    + "duration: " + gesture.duration + " &micro;s, ";
+      gestureString += //"Gesture ID: " + gesture.id + ", "
+                   " " + "type: " + gesture.type + 
+//				   + " , "
+                    //+ "state: " + gesture.state + ", "
+                    //+ "hand IDs: " + gesture.handIds.join(", ") + ", "
+                    //+ "pointable IDs: " + gesture.pointableIds.join(", ") + ", "
+                    "<br />"+ " duration: " + gesture.duration + " &micro;s, ";
 
       switch (gesture.type) {
         case "circle":
-          gestureString += "center: " + vectorToString(gesture.center) + " mm, "
-                        + "normal: " + vectorToString(gesture.normal, 2) + ", "
-                        + "radius: " + gesture.radius.toFixed(1) + " mm, "
-                        + "progress: " + gesture.progress.toFixed(2) + " rotations";
+      //    gestureString += "center: " + vectorToString(gesture.center) + " mm, "
+        //                + "normal: " + vectorToString(gesture.normal, 2) + ", "
+          //              + "radius: " + gesture.radius.toFixed(1) + " mm, "
+            //            + "progress: " + gesture.progress.toFixed(2) + " rotations";
           break;
         case "swipe":
-          gestureString += "start position: " + vectorToString(gesture.startPosition) + " mm, "
-                        + "current position: " + vectorToString(gesture.position) + " mm, "
-                        + "direction: " + vectorToString(gesture.direction, 1) + ", "
-                        + "speed: " + gesture.speed.toFixed(1) + " mm/s";
+//          gestureString += "start position: " + vectorToString(gesture.startPosition) + " mm, "
+  //                      + "current position: " + vectorToString(gesture.position) + " mm, "
+    //                    + "direction: " + vectorToString(gesture.direction, 1) + ", "
+      //                  + "speed: " + gesture.speed.toFixed(1) + " mm/s";
           break;
         case "screenTap":
         case "keyTap":
-          gestureString += "position: " + vectorToString(gesture.position) + " mm";
+       //   gestureString += "position: " + vectorToString(gesture.position) + " mm";
           break;
         default:
           gestureString += "unkown gesture type";
@@ -273,6 +273,7 @@ function getDirection(vector1){
 	}
 	
 	vec_max = Math.max(x,y,z);
+	
 	if (dummy===1){
 	vec_max = vec_max * -1;
 	}
@@ -280,45 +281,28 @@ function getDirection(vector1){
 	
 	switch (max_pos){
 		case 0:
-			return "x  " + vector1[max_pos];
+			if (dummy===1){
+			return "left " + vector1[max_pos];
+			}
+			else
+			return "right " + vector1[max_pos];
 		case 1:
-			return "y  " + vector1[max_pos];
+			if (dummy===1){
+			return "downward " + vector1[max_pos];
+			}
+			else
+			return "upward " + vector1[max_pos];
 		case 2:
-			return "z  " + vector1[max_pos];
+			if (dummy===1){
+			return "backward " + vector1[max_pos];
+			}
+			else
+			return "forward " + vector1[max_pos];
 		default:
 			return "DNE"
 	}
 	
 	return "vec_max " + max_pos + "!!!!";
-	/*x=Math.abs([vector1[0]]);
-	y=Math.abs([vector1[1]]);
-	z=Math.abs([vector1[2]]);
-	vec_abs=[x, y, z];
-	vec_max = Math.max(vec_abs);
-	max_pos = vector1.indexOf(vec_max);*/
-	/*switch (max_pos){
-		case 0:
-			if(vec[0] > 0) {
-				return "Right";
-			}
-			else 
-				return "Left";
-		
-		case 1:
-			if(vec[1] > 0){ 
-				return "Up";}
-			else
-				return "Down";
-		case 2:
-			if(vec[2] > 0){
-				return "Towards User";
-			}
-			else
-				return "Away from User";
-				
-		default:
-		return "DNE";
-	} */
 	
 	// MAKE ABSOLUTE VALUE for all three, and then find the maximum amongst x y z. And then! whatever's the maximum is, only look at that. 
 // And when you look at that, look at the positive or negative sign. Hence, that abs values should be another made up dummy variable. ok? 
@@ -331,7 +315,7 @@ function getDirection(vector1){
 
 <style>
 body {
-    background-image: url("virtual.jpg");
+    background-image: url("virtual2.jpg");
 }
 h1.sansserif {
     font-family: Arial, Helvetica, sans-serif;
@@ -350,7 +334,7 @@ button.ex {
 }0
 </style>
 
-<h1 class="sansserif">LEAP MOTION CONDUCTOR</h1>
+<h1 class="sansserif">Insert Creative Title Here </h1>
 <div id="main">
   <button class="ex" id="pause" onclick="togglePause()">Pause</button>
   <input type="checkbox" id="pauseOnGesture" onclick="pauseForGestures()">Pause on gesture</input>
@@ -360,10 +344,10 @@ button.ex {
   <h3>Hand data:</h3>
   <div id="handData"></div>
   <div style="clear:both;"></div>
-  <h3>Finger and tool data:</h3>
+  <!-- <h3> Finger and tool data:</h3>-->
   <div id="pointableData"></div>
-  <div style="clear:both;"></div>
-  <h3>Gesture data:</h3>
+  <div style="clear:both;"></div> 
+  <h3> Gesture data:</h3>
   <div id="gestureData"></div>
 </div>
 </body>
