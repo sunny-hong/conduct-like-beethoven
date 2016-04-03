@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<!--
+/------------------------------------------------------------------------------\
+| Copyright (C) 2012-2013 Leap Motion, Inc. All rights reserved.               |
+| Leap Motion proprietary and confidential. Not for distribution.              |
+| Use subject to the terms of the Leap Motion SDK Agreement available at       |
+| https://developer.leapmotion.com/sdk_agreement, or another agreement         |
+| between Leap Motion and you, your company or other organization.             |
+\------------------------------------------------------------------------------/
+-->
+
+<!--
+See additional libraries, guides, and examples at:
+set time out 
+set interval
+ - https://developer.leapmotion.com/downloads/javascript
+ - https://developer.leapmotion.com/getting-started/javascript
+ - https://developer.leapmotion.com/gallery/tags/javascript
+-->
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Leap Motion JavaScript Sample</title>
+<script src="http://js.leapmotion.com/leap-0.6.3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.7.0/lodash.min.js"> </script>
+
+<script>
+// Store frame for motion functions
+var previousFrame = null;
+var paused = false;
+var pauseOnGesture = false;
+var positions=[];
+var count=0;
+// Setup Leap loop with frame callback function
+var controllerOptions = {enableGestures: true};
+// to use HMD mode:
+// controllerOptions.optimizeHMD = true;
+/*var init;
+init = document.getElementById("handData");
+var controller = new Leap.loop(controllerOptions, function(frame){
+	var currentFrame = frame;
+	setInterval(getHandPositions( controller.frame(count)),1000);
+})
+*/
+
+_.debounce(leapLoop, 500);
+
+Leap.loop(controllerOptions, leapLoop);
+
+function leapLoop(frame) {
+  if (paused) {
+    return; // Skip this update
+  }
+  // Display Frame object data
+  //frame.currentFrameRate= 1;
+  var frameOutput = document.getElementById("frameData");
+  var frameString = //"Frame ID: " + frame.id  + "<br />" + "Timestamp: " + frame.timestamp + " &micro;s<br />"                   + 
+  frame.hands.length + " hand(s), with "                 + 
+				frame.fingers.length + " fingers!"//+ " fingers<br />" + "FRAMERATE TEST:   " + frame.currentFrameRate + "<br />"
+                //  + "Tools: " + frame.tools.length + "<br />"
+               ;
+  // Frame motion factors
+  if (previousFrame && previousFrame.valid) {
+    var translation = frame.translation(previousFrame);
+   // frameString += "Translation: " + vectorToString(translation) + " mm <br />";
+    var rotationAxis = frame.rotationAxis(previousFrame);
+    var rotationAngle = frame.rotationAngle(previousFrame);
+ //   frameString += "Rotation axis: " + vectorToString(rotationAxis, 2) + "<br />";
+  //  frameString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+    var scaleFactor = frame.scaleFactor(previousFrame);
+    //frameString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+  }
+  frameOutput.innerHTML = "<div style='width:300px; float:left; padding:5px'>" + frameString + "</div>";
+  // Display Hand object data
+  var handOutput = document.getElementById("handData");
+  var handString = "";
+  if (frame.hands.length > 0) {
+  
+  var init1; init1= frame.hand.palmPosition; 
+  
+    for (var i = 0; i < frame.hands.length; i++) {
+      var hand = frame.hands[i];
+	  var j; j=i;
+	  var hand_default = frame.hands[j];
+	  var diffVec= [hand_default.palmPosition[0] -hand.palmPosition[0] , hand_default.palmPosition[1] -hand.palmPosition[1] , hand_default.palmPosition[2] -hand.palmPosition[2]];
+	  var dir1 = getDirection(hand.palmVelocity);
+      handString += "<div style='width:500px; float:left; padding:5px'>";
+    //  handString += "Hand ID: " + hand.id + "<br />";
+      handString += "You are moving " + hand.type + " hand" + " ";
+   //   handString += "Direction: " + vectorToString(hand.direction, 2) + "<br />";
+    //  handString += "Palm position: " + vectorToString(hand.palmPosition) + " mm<br />";
+		//setInterval(getHandPositions(hand.palmPosition), 100000 );
+		//handString += "Palm position difference: " + vectorToString(diffVec) + " mm<br />";
+	//  handString += "Palm velocity: " + vectorToString(hand.palmVelocity) + " <br />";
+	  handString +=  dir1 + "<br />";
+	 // handString+= "typeof Velocity Direction is " + typeof(dir1);
+     // handString += "Grab strength: " + hand.grabStrength + "<br />";
+    //  handString += "Pinch strength: " + hand.pinchStrength + "<br />";
+     // handString += "Confidence: " + hand.confidence + "<br />";
+    //  handString += "Arm direction: " + vectorToString(hand.arm.direction()) + "<br />";
+    //  handString += "Arm center: " + vectorToString(hand.arm.center()) + "<br />";
+     // handString += "Arm up vector: " + vectorToString(hand.arm.basis[1]) + "<br />";
+	
+      // Hand motion factors
+	
+	  
+	if (previousFrame && previousFrame.valid) {
+        var translation = hand.translation(previousFrame);
+    //    handString += "Translation: " + vectorToString(translation) + " mm<br />";
+        var rotationAxis = hand.rotationAxis(previousFrame, 2);
+        var rotationAngle = hand.rotationAngle(previousFrame);
+    //    handString += "Rotation axis: " + vectorToString(rotationAxis) + "<br />";
+     //   handString += "Rotation angle: " + rotationAngle.toFixed(2) + " radians<br />";
+        var scaleFactor = hand.scaleFactor(previousFrame);
+       // handString += "Scale factor: " + scaleFactor.toFixed(2) + "<br />";
+      }
+      // IDs of pointables associated with this hand
+      if (hand.pointables.length > 0) {
+        var fingerIds = [];
+        for (var j = 0; j < hand.pointables.length; j++) {
+          var pointable = hand.pointables[j];
+            fingerIds.push(pointable.id);
+        }
+        if (fingerIds.length > 0) {
+     //     handString += "Fingers IDs: " + fingerIds.join(", ") + "<br />";
+        }
+      }
+      handString += "</div>";
+    }
+	//var myVar;
+//	myVar = setInterval(function(hand_default, frame.hands){} )
+  }// if
+  else {
+    handString += "No hands";
+  }
+  handOutput.innerHTML = handString;
+  // Display Pointable (finger and tool) object data
+  var pointableOutput = document.getElementById("pointableData");
+  var pointableString = "";
+  if (frame.pointables.length > 0) {
+    var fingerTypeMap = ["Thumb", "Index finger", "Middle finger", "Ring finger", "Pinky finger"];
+    var boneTypeMap = ["Metacarpal", "Proximal phalanx", "Intermediate phalanx", "Distal phalanx"];
+    for (var i = 0; i < frame.pointables.length; i++) {
+      var pointable = frame.pointables[i];
+      pointableString += "<div style='width:250px; float:left; padding:5px'>";
+      if (pointable.tool) {
+       // pointableString += "Pointable ID: " + pointable.id + "<br />";
+       // pointableString += "Classified as a tool <br />";
+     //   pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
+     //   pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
+      //  pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
+      //  pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />"
+        pointableString += "</div>";
+      }
+      else {
+        //pointableString += "Pointable ID: " + pointable.id + "<br />";
+        //pointableString += "Type: " + fingerTypeMap[pointable.type] + "<br />";
+        //pointableString += "Belongs to hand with ID: " + pointable.handId + "<br />";
+        //pointableString += "Classified as a finger<br />";
+      //  pointableString += "Length: " + pointable.length.toFixed(1) + " mm<br />";
+        //pointableString += "Width: "  + pointable.width.toFixed(1) + " mm<br />";
+       // pointableString += "Direction: " + vectorToString(pointable.direction, 2) + "<br />";
+       // pointableString += "Extended?: "  + pointable.extended + "<br />";
+        pointable.bones.forEach( function(bone){
+       //   pointableString += boneTypeMap[bone.type] + " bone <br />";
+      //   pointableString += "Center: " + vectorToString(bone.center()) + "<br />";
+       //   pointableString += "Direction: " + vectorToString(bone.direction()) + "<br />";
+       //   pointableString += "Up vector: " + vectorToString(bone.basis[1]) + "<br />";
+        });
+       // pointableString += "Tip position: " + vectorToString(pointable.tipPosition) + " mm<br />";
+        pointableString += "</div>";
+      }
+    }
+  }
+  else {
+   // pointableString += "<div>No pointables</div>";
+  }
+  pointableOutput.innerHTML = pointableString;
+  // Display Gesture object data
+  var gestureOutput = document.getElementById("gestureData");
+  var gestureString = "";
+  if (frame.gestures.length > 0) {
+    if (pauseOnGesture) {
+      togglePause();
+    }
+    for (var i = 0; i < frame.gestures.length; i++) {
+      var gesture = frame.gestures[i];
+   //   gestureString += //"Gesture ID: " + gesture.id + ", "
+    //               " " + "type: " + gesture.type + 
+//				   + " , "
+                    //+ "state: " + gesture.state + ", "
+                    //+ "hand IDs: " + gesture.handIds.join(", ") + ", "
+                    //+ "pointable IDs: " + gesture.pointableIds.join(", ") + ", "
+      //              "<br />"+ " duration: " + gesture.duration + " &micro;s, ";
+      switch (gesture.type) {
+        case "circle":
+      //    gestureString += "center: " + vectorToString(gesture.center) + " mm, "
+        //                + "normal: " + vectorToString(gesture.normal, 2) + ", "
+          //              + "radius: " + gesture.radius.toFixed(1) + " mm, "
+            //            + "progress: " + gesture.progress.toFixed(2) + " rotations";
+          break;
+        case "swipe":
+//          gestureString += "start position: " + vectorToString(gesture.startPosition) + " mm, "
+  //                      + "current position: " + vectorToString(gesture.position) + " mm, "
+    //                    + "direction: " + vectorToString(gesture.direction, 1) + ", "
+      //                  + "speed: " + gesture.speed.toFixed(1) + " mm/s";
+          break;
+        case "screenTap":
+        case "keyTap":
+       //   gestureString += "position: " + vectorToString(gesture.position) + " mm";
+          break;
+        default:
+          gestureString += "unkown gesture type";
+      }
+      gestureString += "<br />";
+    }
+  }
+  else {
+ //   gestureString += "No gestures";
+  }
+  gestureOutput.innerHTML = gestureString;
+  // Store frame for motion functions
+  previousFrame = frame;
+}
+
+/*
+//count and gethand~~
+function getHandPositions(frame){
+	positions[count] = frame.hands[0];
+	console.log(frame.hands[frame.hands.length-1]) ;
+	console.log(positions[count] );
+	count++;
+}
+*/
+function vectorToString(vector, digits) {
+  if (typeof digits === "undefined") {
+    digits = 1;
+  }
+  
+  return "(" + vector[0].toFixed(digits) + ", "
+             + vector[1].toFixed(digits) + ", "
+             + vector[2].toFixed(digits) + ")";
+}
+function togglePause() {
+  paused = !paused;
+  if (paused) {
+    document.getElementById("pause").innerText = "Resume";
+  } else {
+    document.getElementById("pause").innerText = "Pause";
+  }
+}
+function pauseForGestures() {
+  if (document.getElementById("pauseOnGesture").checked) {
+    pauseOnGesture = true;
+  } else {
+    pauseOnGesture = false;
+  }
+}
+// [SH] Interval function part 2. Gets x y z difference and tells if it is going positively y/x/z 
+function getDirection(vector1){
+	var vector1, vec_abs, vec_max, max_pos; 
+	var x,y,z,dummy;
+	dummy=0;
+	x= vector1[0];
+	y= vector1[1];
+	z= vector1[2];
+	if (x<0){
+	 x= x*-1;
+	 dummy=1;
+	}
+	if (y<0){
+	y = y*-1;dummy=1;}
+	if (z<0){
+	z=z*-1;dummy=1;
+	}
+	
+	vec_max = Math.max(x,y,z);
+	
+	if (dummy===1){
+	vec_max = vec_max * -1;
+	}
+	max_pos = vector1.indexOf(vec_max);
+	
+	switch (max_pos){
+		case 0:
+			if (dummy===1){
+			return "LEFT " + vector1[max_pos] + " mm / second";
+			}
+			else
+			return "RIGHT " + vector1[max_pos]+ " mm / second";
+		case 1:
+			if (dummy===1){
+			return "DOWNWARD " + vector1[max_pos]+ " mm / second";
+			}
+			else
+			return "UPWARD " + vector1[max_pos]+ " mm / second";
+		case 2:
+			if (dummy===1){
+			return "BACKWARD " + vector1[max_pos]+ " mm / second";
+			}
+			else
+			return "FORWARD " + vector1[max_pos]+ " mm / second";
+		default:
+			return " "
+	}
+	
+	return "vec_max " + max_pos + "!!!!";
+	
+	// MAKE ABSOLUTE VALUE for all three, and then find the maximum amongst x y z. And then! whatever's the maximum is, only look at that. 
+// And when you look at that, look at the positive or negative sign. Hence, that abs values should be another made up dummy variable. ok? 
+// 	switch will make it look prettier:) 
+}
+
+
+</script>
+</head>
+
+
+
+
+
+
+<style>
+body {
+    background-image: url("virtual2.jpg");
+}
+h1.sansserif {
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    color: white;
+    padding: 50px 30px 50px 100px;
+	    font-family: sans-serif;
+}
+h1 {
+    color: white;
+	    font-family: sans-serif;
+		margin-right: 100px;
+    padding: 1px 10px 10px 450px;
+}
+button.ex {
+	margin-top: 0 px;
+    margin-left: 800px;
+    margin-bottom: 10px;
+    
+}0
+
+
+</style>
+
+<h1 class="sansserif"> CONDUCT LIKE BEETHOVEN! </h1>
+<div id="main">
+  <div class="row">
+  <div class="medium-4 columns">
+    <label>Select Time Signature
+      <select id="SelectMenu">
+        <option value="four_two"> 2/4 </option>
+        <option value="four_three"> 3/4 </option>
+        <option value="four_four"> 4/4 </option>
+        <option value="six_eight"> 6/8 </option>
+      </select>
+    </label>
+  </div>
+</div>  
+  
+	
+  <button class="ex" id="pause" onclick="togglePause()">Pause</button>
+ 
+  <h3>Leap Sensor can see</h3>
+  <div id="frameData"></div>
+  <div style="clear:both;"></div>
+  <div id="handData"></div>
+  <div id="pointableData"></div>
+  <div style="clear:both;"></div> 
+  <h3 Hand Motion: /h3>
+  <div style="clear:both;" id="gestureData"></div>
+  
+  
+  
+<!--  <h3>  </h3>
+  <div id="gestureData"></div> -->
+<h4>Time signature 2/4 </h4>
+<img src="24.png" alt="twofour" style="width:200px;height:200px;">
+<h4>Time signature 3/4 </h4>
+<img src="34.jpg" alt="threefour" style="width:200px;height:200px;">
+<h4>Time signature 4/4 </h4>
+<img src="44.gif" alt="fourfour" style="width:200px;height:200px;">
+<h4>Time signature 6/8 </h4>
+<img src="68.jpg" alt="sixeight" style="width:200px;height:200px;">
+
+
+
+</div>
+</body>
+</html>
